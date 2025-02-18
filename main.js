@@ -7,6 +7,7 @@ app.whenReady().then(() => {
         width: 400,
         height: 600,
         resizable : false, //크기 조절 비활성화
+        backgroundColor: '#2f2f2f',
         webPreferences: {
             nodeIntegration: true,
         },

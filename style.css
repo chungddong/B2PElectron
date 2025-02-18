@@ -1,0 +1,124 @@
+html {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 15px;
+    background-color: white;
+}
+
+.headerBox {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+
+.headerBox .Icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.headerBox .Title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+
+.headerBox .Setting {
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+}
+
+/* -------------------------------------------------------------- */
+
+.MenuBox {
+    width: 100%;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0px;
+}
+
+.MenuBox .SearchBar {
+    width: 100%;
+}
+
+.MenuBox .SearchBar input {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    background-color: #EDEDED;
+    border: 0px;
+    border-radius: 10px;
+    padding: 0px 10px;
+}
+
+.MenuBox .DropBox {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.MenuBox .DropBox select {
+    flex: 3;
+}
+
+/* -------------------------------------------------------------- */
+
+.Preview {
+    width: 100%;
+    flex: 8;
+    margin: 15px 0px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background-color: #EDEDED;
+}
+
+.ButtonBox {
+    flex: 2;
+    display: flex;
+}
+
+.Button_ppt {
+    flex: 1;
+    background-color: #EDEDED;
+    margin-right: 10px; 
+    
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #787878;
+}
+
+.Button_Slide {
+    flex: 2;
+    background-color: #414141;
+
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: white;
+}
