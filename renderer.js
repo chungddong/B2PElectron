@@ -2,7 +2,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('assets/bible-books.json');
         if (!response.ok) throw new Error("JSON 파일을 찾을 수 없습니다.");
-        
+
         const bibleBooks = await response.json();
         console.log("불러온 JSON 데이터:", bibleBooks);
 
@@ -67,7 +67,7 @@ document.getElementById("verse-select").addEventListener("change", function () {
     const selectedVerse = this.value;
     const previewElement = document.querySelector(".Preview");
 
-    const verseElement = Array.from(previewElement.children).find(el => 
+    const verseElement = Array.from(previewElement.children).find(el =>
         el.textContent.includes(`${selectedVerse}절:`)
     );
 
@@ -275,7 +275,7 @@ async function performSearch() {
     // 오류 메시지 숨기기
     hideError();
 
-    
+
     const searchValue = searchInput.value.trim();
     const abbreviationData = bibleBooks; // 이미 로드된 약어 데이터 사용
 
@@ -361,9 +361,11 @@ function hideError() {
     }
 }
 
-document.getElementById("slide-start-button").addEventListener("click", function () {
+let pptWindow = null; // PPT 창을 추적하는 변수
 
+document.getElementById("slide-start-button").addEventListener("click", function () {
     console.log(verses);
+
     // 선택된 구절 정보 가져오기
     const selectedBook = document.getElementById('bible-select').value;
     const selectedChapter = document.getElementById('chapter-select').value;
@@ -373,11 +375,16 @@ document.getElementById("slide-start-button").addEventListener("click", function
     localStorage.setItem("selectedBible", selectedBook);
     localStorage.setItem("selectedChapter", selectedChapter);
     localStorage.setItem("selectedVerse", selectedVerse);
+    localStorage.setItem('verses', JSON.stringify(verses));
 
-    localStorage.setItem('verses', JSON.stringify(verses)); 
+    // 기존 PPT 창이 열려 있으면 닫기
+    if (pptWindow && !pptWindow.closed) {
+        pptWindow.close();
+    }
 
-    // ppt.html 창 열기
-    window.open("ppt.html", "_blank");
+    // 새 창 열기 (메뉴바 숨기기)
+    pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
 });
+
 
 

@@ -2,15 +2,28 @@
   "name": "b2pelectron",
   "version": "1.0.0",
   "main": "main.js",
-"scripts": {
-    "start": "electron ."
-}
-,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "electron": "^34.2.0"
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.yourapp.b2p",
+    "productName": "B2P Bible Viewer",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/B2PIcon.png"
+    }
   }
 }
