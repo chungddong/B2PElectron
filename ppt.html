@@ -3,20 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPT 화면</title>
+    <title>슬라이드</title>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: black;
             color: white;
-            font-size: 32px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #verse-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        #verse-content {
+            font-size: 4rem;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    PPT 화면입니다.
+    <div id="verse-title">로딩 중...</div>
+    <div id="verse-content">말씀이 여기에 표시됩니다.</div>
+
 </body>
 </html>

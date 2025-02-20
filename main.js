@@ -16,4 +16,6 @@ app.whenReady().then(() => {
 
     mainWindow.loadFile('index.html');
     mainWindow.setMenu(null); // 메뉴 제거
+    mainWindow.webContents.openDevTools(); //개발자 도구 실행
 });
+

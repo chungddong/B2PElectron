@@ -74,11 +74,17 @@ body {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 5px;
+    margin-top: 15px;
 }
 
 
 .MenuBox .DropBox select {
     flex: 3;
+    background-color: #EDEDED;
+    border-radius: 10px;
+    height: 30px;
+    border: 0px;
 }
 
 /* -------------------------------------------------------------- */
@@ -86,11 +92,12 @@ body {
 .Preview {
     width: 100%;
     flex: 8;
-    margin: 15px 0px;
-    padding: 10px;
+    margin-bottom: 15px;
+    padding: 10px 10px;
     box-sizing: border-box;
     border-radius: 10px;
     background-color: #EDEDED;
+    overflow-y: auto;
 }
 
 .ButtonBox {
@@ -122,3 +129,30 @@ body {
     font-size: 15px;
     color: white;
 }
+
+.Button_Slide:hover {
+    background-color: #787878;
+    cursor: pointer;
+}
+
+
+
+#autocomplete-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1201; 
+}
+
+#error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    position: relative;
+    z-index: 1200;
+}
+
