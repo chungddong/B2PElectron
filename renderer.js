@@ -129,6 +129,7 @@ async function loadBible(bookValue) {
     }
 }
 
+let verses = [];
 
 // 선택된 장의 절들을 모두 출력
 async function loadVerses(selectedChapter) {
@@ -151,7 +152,7 @@ async function loadVerses(selectedChapter) {
         console.log("권이름 : " + bookAbbreviation);
 
         let maxVerseNumber = 0;
-        let verses = [];
+        verses = []; // verses 배열 초기화
 
         lines.forEach(line => {
             const match = line.match(new RegExp(`^${bookAbbreviation}(\\d+):(\\d+)(.*)`));
@@ -167,7 +168,7 @@ async function loadVerses(selectedChapter) {
             }
         });
 
-        // 🔹 절 선택 박스 업데이트
+        //절 선택 박스 업데이트
         const verseSelectElement = document.getElementById("verse-select");
         if (verseSelectElement) {
             verseSelectElement.innerHTML = "";
@@ -179,7 +180,8 @@ async function loadVerses(selectedChapter) {
             }
         }
 
-        // 🔹 Preview div에 모든 절 표시
+
+        //Preview div에 모든 절 표시
         const previewElement = document.querySelector(".Preview");
         if (verses.length > 0) {
             previewElement.innerHTML = verses.join("");
@@ -245,6 +247,7 @@ searchInput.addEventListener("input", function () {
 
     matches.forEach(match => {
         let item = document.createElement("div");
+        item.setAttribute("id", "autocomplete-list-item");
         item.textContent = match; // 전체 이름 표시
         item.style.padding = "5px";
         item.style.cursor = "pointer";
@@ -357,4 +360,24 @@ function hideError() {
         existingError.remove();
     }
 }
+
+document.getElementById("slide-start-button").addEventListener("click", function () {
+
+    console.log(verses);
+    // 선택된 구절 정보 가져오기
+    const selectedBook = document.getElementById('bible-select').value;
+    const selectedChapter = document.getElementById('chapter-select').value;
+    const selectedVerse = document.getElementById('verse-select').value;
+
+    // 구절 정보를 localStorage에 저장
+    localStorage.setItem("selectedBible", selectedBook);
+    localStorage.setItem("selectedChapter", selectedChapter);
+    localStorage.setItem("selectedVerse", selectedVerse);
+
+    localStorage.setItem('verses', JSON.stringify(verses)); 
+
+    // ppt.html 창 열기
+    window.open("ppt.html", "_blank");
+});
+
 

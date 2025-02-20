@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>슬라이드</title>
+    <title>PPT Viewer</title>
     <style>
         body {
             display: flex;
@@ -15,21 +16,99 @@
             color: white;
             font-family: Arial, sans-serif;
             text-align: center;
+            overflow: hidden;
+            padding-left: 4em;
+            padding-right: 4em;
         }
+
         #verse-title {
-            font-size: 2rem;
-            margin-bottom: 20px;
+            font-size: 4rem;
+            margin-bottom: 2em;
             font-weight: bold;
         }
+
         #verse-content {
             font-size: 4rem;
             font-weight: bold;
         }
     </style>
 </head>
-<body>
-    <div id="verse-title">로딩 중...</div>
-    <div id="verse-content">말씀이 여기에 표시됩니다.</div>
 
+<body>
+    <div id="verse-title"></div>
+    <div id="verse-content"></div>
+
+    <script>
+        // 페이지 로드 시 선택된 구절 정보 가져오기
+        let selectedBook = localStorage.getItem("selectedBible");
+        const selectedChapter = localStorage.getItem("selectedChapter");
+        let selectedVerse = parseInt(localStorage.getItem("selectedVerse"), 10) || 1;
+
+        const titleElement = document.getElementById("verse-title");
+        const contentElement = document.getElementById("verse-content");
+
+        window.onload = function () {
+            const verses = JSON.parse(localStorage.getItem('verses'));
+
+            // selectedBook에서 숫자와 '-' 기호 제거
+            const bookName = selectedBook.replace(/^\d+-\d+/, '');
+            selectedBook = bookName;
+
+            updateVerseDisplay();
+        };
+
+        // 말씀 업데이트 함수
+        function updateVerseDisplay() {
+            const verses = JSON.parse(localStorage.getItem('verses'));
+            titleElement.innerHTML = `${selectedBook} ${selectedChapter}장 ${selectedVerse}절`;
+
+            const selectedVerseId = `verse-${selectedVerse}`;
+            const selectedVerseContent = verses.find(v => v.includes(`id="${selectedVerseId}"`));
+
+            if (selectedVerseContent) {
+                let verseText = selectedVerseContent.replace(/<[^>]+>/g, '');
+                const colonIndex = verseText.indexOf(':');
+                if (colonIndex !== -1) {
+                    verseText = verseText.substring(colonIndex + 1).trim();
+                }
+                contentElement.innerHTML = verseText;
+            } else {
+                contentElement.innerHTML = "해당 절을 찾을 수 없습니다.";
+            }
+
+            // localStorage에 업데이트
+            localStorage.setItem("selectedVerse", selectedVerse);
+        }
+
+        // 다음 구절 표시 (구절 번호를 증가)
+        function showNextVerse() {
+            const verses = JSON.parse(localStorage.getItem('verses'));
+            if (selectedVerse < verses.length) {
+                selectedVerse++;
+                updateVerseDisplay();
+            }
+        }
+
+        // 이전 구절 표시 (구절 번호를 감소)
+        function showPreviousVerse() {
+            if (selectedVerse > 1) {
+                selectedVerse--;
+                updateVerseDisplay();
+            }
+        }
+
+        // 키보드 이벤트 처리
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                window.close(); // ESC 키 누르면 창 닫기
+            } else if (event.key === "ArrowRight") {
+                showNextVerse(); // → 키 누르면 다음 구절
+            } else if (event.key === "ArrowLeft") {
+                showPreviousVerse(); // ← 키 누르면 이전 구절
+            }
+        });
+
+    </script>
 </body>
+
 </html>
