@@ -36,34 +36,46 @@
 
 <body>
     <div id="verse-title"></div>
-    <div id="verse-content"></div>
-
-    <script>
-        // 페이지 로드 시 선택된 구절 정보 가져오기
-        let selectedBook = localStorage.getItem("selectedBible");
-        const selectedChapter = localStorage.getItem("selectedChapter");
-        let selectedVerse = parseInt(localStorage.getItem("selectedVerse"), 10) || 1;
-
+    <div id="verse-content"></div>    <script>
         const titleElement = document.getElementById("verse-title");
         const contentElement = document.getElementById("verse-content");
 
-        window.onload = function () {
-            const verses = JSON.parse(localStorage.getItem('verses'));
-
-            // selectedBook에서 숫자와 '-' 기호 제거
-            const bookName = selectedBook.replace(/^\d+-\d+/, '');
-            selectedBook = bookName;
-
-            updateVerseDisplay();
+        // 전역 변수로 현재 상태 관리
+        let state = {
+            selectedBook: '',
+            selectedChapter: '',
+            selectedVerse: 1,
+            verses: []
         };
 
-        // 말씀 업데이트 함수
-        function updateVerseDisplay() {
-            const verses = JSON.parse(localStorage.getItem('verses'));
-            titleElement.innerHTML = `${selectedBook} ${selectedChapter}장 ${selectedVerse}절`;
+        // 상태 초기화 함수
+        function initializeState() {
+            const bookName = localStorage.getItem("selectedBible");
+            state.selectedBook = bookName ? bookName.replace(/^\d+-\d+/, '') : '';
+            state.selectedChapter = localStorage.getItem("selectedChapter");
+            state.selectedVerse = parseInt(localStorage.getItem("selectedVerse"), 10) || 1;
+            state.verses = JSON.parse(localStorage.getItem('verses')) || [];
+        }
 
-            const selectedVerseId = `verse-${selectedVerse}`;
-            const selectedVerseContent = verses.find(v => v.includes(`id="${selectedVerseId}"`));
+        // 초기 로드
+        window.onload = function() {
+            initializeState();
+            updateVerseDisplay();
+        };
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedVerse' || e.key === 'selectedBible' || e.key === 'selectedChapter' || e.key === 'verses') {
+                updateVerseDisplay();
+            }
+        });        // 말씀 업데이트 함수
+        function updateVerseDisplay() {
+            // 상태 업데이트
+            initializeState();
+
+            // 화면 업데이트
+            titleElement.innerHTML = `${state.selectedBook} ${state.selectedChapter}장 ${state.selectedVerse}절`;
+
+            const selectedVerseId = `verse-${state.selectedVerse}`;
+            const selectedVerseContent = state.verses.find(v => v.includes(`id="${selectedVerseId}"`));
 
             if (selectedVerseContent) {
                 let verseText = selectedVerseContent.replace(/<[^>]+>/g, '');
@@ -78,33 +90,77 @@
 
             // localStorage에 업데이트
             localStorage.setItem("selectedVerse", selectedVerse);
-        }
-
-        // 다음 구절 표시 (구절 번호를 증가)
+        }        // 다음 구절 표시 (구절 번호를 증가)
         function showNextVerse() {
-            const verses = JSON.parse(localStorage.getItem('verses'));
-            if (selectedVerse < verses.length) {
-                selectedVerse++;
+            if (state.selectedVerse < state.verses.length) {
+                state.selectedVerse++;
+                localStorage.setItem("selectedVerse", state.selectedVerse);
                 updateVerseDisplay();
             }
         }
 
         // 이전 구절 표시 (구절 번호를 감소)
         function showPreviousVerse() {
-            if (selectedVerse > 1) {
-                selectedVerse--;
+            if (state.selectedVerse > 1) {
+                state.selectedVerse--;
+                localStorage.setItem("selectedVerse", state.selectedVerse);
                 updateVerseDisplay();
             }
         }
 
-        // 키보드 이벤트 처리
+        // 특정 구절로 이동
+        function goToVerse(verseNumber) {
+            if (verseNumber >= 1 && verseNumber <= state.verses.length) {
+                state.selectedVerse = verseNumber;
+                localStorage.setItem("selectedVerse", state.selectedVerse);
+                updateVerseDisplay();
+            } else {
+                alert("유효하지 않은 구절 번호입니다.");
+            }
+        }// 키보드 이벤트 통합 처리
+        let inputBuffer = "";
+        let inputTimeout;
+        
         document.addEventListener("keydown", function (event) {
+            // ESC 키 처리
             if (event.key === "Escape") {
-                window.close(); // ESC 키 누르면 창 닫기
-            } else if (event.key === "ArrowRight") {
-                showNextVerse(); // → 키 누르면 다음 구절
-            } else if (event.key === "ArrowLeft") {
-                showPreviousVerse(); // ← 키 누르면 이전 구절
+                window.close();
+                return;
+            }
+
+            // 화살표 키 처리
+            if (event.key === "ArrowRight") {
+                showNextVerse();
+                inputBuffer = ""; // 버퍼 초기화
+                return;
+            }
+            if (event.key === "ArrowLeft") {
+                showPreviousVerse();
+                inputBuffer = ""; // 버퍼 초기화
+                return;
+            }
+
+            // 숫자 키 입력 처리
+            if (!isNaN(event.key)) {
+                inputBuffer += event.key;
+                
+                // 이전 타이머 취소
+                clearTimeout(inputTimeout);
+                
+                // 2초 후 버퍼 초기화를 위한 타이머 설정
+                inputTimeout = setTimeout(() => {
+                    inputBuffer = "";
+                }, 2000);
+            }
+            
+            // Enter 키 처리
+            if (event.key === "Enter" && inputBuffer.length > 0) {
+                const verseNumber = parseInt(inputBuffer, 10);
+                if (!isNaN(verseNumber)) {
+                    goToVerse(verseNumber);
+                }
+                inputBuffer = "";
+                clearTimeout(inputTimeout);
             }
         });
 

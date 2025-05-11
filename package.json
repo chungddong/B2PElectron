@@ -16,8 +16,8 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.yourapp.b2p",
-    "productName": "B2P Bible Viewer",
+    "appId": "com.sophra.b2p",
+    "productName": "성경 PPT 생성기",
     "directories": {
       "output": "dist"
     },

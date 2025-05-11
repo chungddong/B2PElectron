@@ -375,15 +375,14 @@ document.getElementById("slide-start-button").addEventListener("click", function
     localStorage.setItem("selectedBible", selectedBook);
     localStorage.setItem("selectedChapter", selectedChapter);
     localStorage.setItem("selectedVerse", selectedVerse);
-    localStorage.setItem('verses', JSON.stringify(verses));
-
-    // 기존 PPT 창이 열려 있으면 닫기
-    if (pptWindow && !pptWindow.closed) {
-        pptWindow.close();
+    localStorage.setItem('verses', JSON.stringify(verses));    // PPT 창이 없거나 닫혀있으면 새로 생성
+    if (!pptWindow || pptWindow.closed) {
+        pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
+    } else {
+        // 기존 창이 있으면 해당 창의 updateVerseDisplay 함수를 호출
+        pptWindow.updateVerseDisplay();
+        pptWindow.focus(); // 기존 창을 포커스
     }
-
-    // 새 창 열기 (메뉴바 숨기기)
-    pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
 });
 
 
