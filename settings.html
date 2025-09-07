@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설정 - 성경2PPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .settings-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .settings-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-group:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .setting-description {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: white;
+            box-sizing: border-box;
+        }
+
+        .setting-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-save {
+            background-color: #414141;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #555;
+        }
+
+        .btn-cancel {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <div class="settings-title">설정</div>
+            <div class="settings-subtitle">성경 PPT 생성기 설정을 관리합니다</div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">슬라이드 배경</div>
+            <div class="setting-description">PPT 슬라이드의 배경 이미지를 선택합니다</div>
+            <select class="setting-select" id="background-select">
+                <option value="bg01.jpg">기본 배경 1</option>
+                <option value="bg02.jpg">기본 배경 2</option>
+                <option value="bg03.jpg">기본 배경 3</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">글꼴 크기</div>
+            <div class="setting-description">슬라이드에 표시되는 글꼴 크기를 조정합니다</div>
+            <select class="setting-select" id="font-size-select">
+                <option value="small">작게 (3rem)</option>
+                <option value="medium" selected>보통 (4rem)</option>
+                <option value="large">크게 (5rem)</option>
+                <option value="xlarge">매우 크게 (6rem)</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">자동 절 이동</div>
+            <div class="setting-description">키보드 화살표로 자동으로 다음/이전 절로 이동</div>
+            <div class="setting-checkbox">
+                <input type="checkbox" id="auto-verse-checkbox" checked>
+                <label for="auto-verse-checkbox">자동 절 이동 활성화</label>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="setting-label">슬라이드 전환 효과</div>
+            <div class="setting-description">절 변경 시 전환 효과를 설정합니다</div>
+            <select class="setting-select" id="transition-select">
+                <option value="none">효과 없음</option>
+                <option value="fade" selected>페이드</option>
+                <option value="slide">슬라이드</option>
+            </select>
+        </div>
+
+        <div class="buttons-container">
+            <button class="btn btn-cancel" id="cancel-btn">취소</button>
+            <button class="btn btn-save" id="save-btn">저장</button>
+        </div>
+    </div>
+
+    <script>
+        // 설정 로드
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+            
+            document.getElementById('background-select').value = settings.background || 'bg01.jpg';
+            document.getElementById('font-size-select').value = settings.fontSize || 'medium';
+            document.getElementById('auto-verse-checkbox').checked = settings.autoVerse !== false;
+            document.getElementById('transition-select').value = settings.transition || 'fade';
+        }
+
+        // 설정 저장
+        function saveSettings() {
+            const settings = {
+                background: document.getElementById('background-select').value,
+                fontSize: document.getElementById('font-size-select').value,
+                autoVerse: document.getElementById('auto-verse-checkbox').checked,
+                transition: document.getElementById('transition-select').value
+            };
+            
+            localStorage.setItem('appSettings', JSON.stringify(settings));
+            alert('설정이 저장되었습니다.');
+            window.close();
+        }
+
+        // 이벤트 리스너
+        document.getElementById('save-btn').addEventListener('click', saveSettings);
+        document.getElementById('cancel-btn').addEventListener('click', () => window.close());
+
+        // 페이지 로드 시 설정 불러오기
+        window.onload = loadSettings;
+    </script>
+</body>
+</html>

@@ -7,53 +7,91 @@
     <title>성경2PPT</title>
 </head>
 <body>
-    <div class="headerBox">
-        <div class="Icon">
-            <img src="assets/B2PIcon.png" alt="이미지 설명">
+    <!-- 메인 페이지 -->
+    <div id="main-page">
+        <div class="headerBox">
+            <div class="Icon">
+                <img src="assets/B2PIcon.png" alt="이미지 설명">
+            </div>
+
+            <div class="Title">
+                성경 PPT 생성기
+            </div>
+
+            <div class="Setting">
+                <div class="SettingButton" id="setting-button">⚙️</div>
+            </div>
         </div>
 
-        <div class="Title">
-            성경 PPT 생성기
+        <div class="MenuBox"> <!--검색창, 선택 드롭박스 창창-->
+            <div class="SearchBar">
+                <input type="text" id="search-input" placeholder="성경 검색 (예: 빌4:13-21) ">
+            </div>
+            <div class="DropBox">
+                <select id="bible-select">
+                    <!-- 성경 권 옵션들이 여기에 추가될 예정 -->
+                </select>
+                <select id="chapter-select">
+                    <!-- 장 번호 옵션들이 여기에 추가될 예정 -->
+                </select>
+                <select id="verse-select">
+
+                </select>
+            </div>
         </div>
 
-        <div class="Setting">
-            
+        <div class="ContentArea">
+            <div class="Preview">
+                미리보기 창
+            </div>
+            <div class="HistoryPanel">
+                <div class="HistoryTitle">생성된 PPT</div>
+                <div class="HistoryList" id="ppt-history-list">
+                    <!-- PPT 기록들이 여기에 표시됩니다 -->
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="MenuBox"> <!--검색창, 선택 드롭박스 창창-->
-        <div class="SearchBar">
-            <input type="text" id="search-input" placeholder="성경 검색 (예: 빌4:13-21) ">
-        </div>
-        <div class="DropBox">
-            <select id="bible-select">
-                <!-- 성경 권 옵션들이 여기에 추가될 예정 -->
-            </select>
-            <select id="chapter-select">
-                <!-- 장 번호 옵션들이 여기에 추가될 예정 -->
-            </select>
-            <select id="verse-select">
-
-            </select>
-        </div>
-    </div>
-
-    <div class="ContentArea">
-        <div class="Preview">
-            미리보기 창
-        </div>
-        <div class="HistoryPanel">
-            <div class="HistoryTitle">생성된 PPT</div>
-            <div class="HistoryList" id="ppt-history-list">
-                <!-- PPT 기록들이 여기에 표시됩니다 -->
+        <div class="ButtonBox">
+            <div class="Button_Slide" id="slide-start-button">
+                슬라이드 시작
             </div>
         </div>
     </div>
 
-    <div class="ButtonBox">
+    <!-- 설정 페이지 -->
+    <div id="settings-page" style="display: none;">
+        <div class="settings-container">
+            <div class="settings-header">
+                <div class="back-button" id="back-button">← 뒤로가기</div>
+                <div class="settings-title">설정</div>
+                <div class="settings-subtitle">성경 PPT 생성기 설정을 관리합니다</div>
+            </div>
 
-        <div class="Button_Slide" id="slide-start-button">
-            슬라이드 시작
+            <div class="settings-content">
+                <div class="setting-group">
+                    <div class="setting-label">슬라이드 배경</div>
+                    <div class="setting-description">PPT 슬라이드의 배경 이미지 경로를 설정합니다</div>
+                    <div class="file-input-container">
+                        <input type="text" class="setting-input" id="background-path" placeholder="assets/bg01.jpg" readonly>
+                        <button class="file-browse-btn" id="browse-background">변경</button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">PPT 디스플레이</div>
+                    <div class="setting-description">PPT를 표시할 모니터를 선택합니다</div>
+                    <select class="setting-select" id="display-select">
+                        <option value="primary">기본 모니터</option>
+                        <!-- 연결된 모니터들이 여기에 추가됩니다 -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn btn-cancel" id="cancel-btn">취소</button>
+                <button class="btn btn-save" id="save-btn">저장</button>
+            </div>
         </div>
     </div>
 

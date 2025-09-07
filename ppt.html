@@ -12,13 +12,17 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: url('assets/bg01.jpg') no-repeat center center;
+            background-color: #2c3e50;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
             color: white;
             font-family: Arial, sans-serif;
             text-align: center;
             overflow: hidden;
             padding-left: 6em;
             padding-right: 6em;
+            margin: 0;
         }
 
         #verse-title {
@@ -57,25 +61,107 @@
             state.verses = JSON.parse(localStorage.getItem('verses')) || [];
         }
 
+        // 배경 이미지 로드 함수
+        function loadBackgroundImage() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+                console.log('로드된 설정:', settings);
+                
+                let backgroundPath = settings.backgroundPath || 'assets/bg01.jpg';
+                console.log('원본 배경 경로:', backgroundPath);
+                
+                // 경로 처리 함수
+                function processPath(path) {
+                    // 절대 경로인 경우 (Windows C:\... 또는 Unix /...)
+                    if (path.match(/^[a-zA-Z]:/) || path.startsWith('/')) {
+                        // file:// 프로토콜 추가
+                        return 'file:///' + path.replace(/\\/g, '/');
+                    }
+                    // 상대 경로인 경우
+                    return path;
+                }
+                
+                // 여러 경로 형태로 시도
+                const pathsToTry = [
+                    processPath(backgroundPath),           // file:// 프로토콜 추가된 경로
+                    backgroundPath.replace(/\\/g, '/'),    // 백슬래시를 슬래시로 변경
+                    './' + backgroundPath,                 // 현재 디렉토리 기준
+                    'assets/bg01.jpg'                      // 기본 이미지로 폴백
+                ];
+                
+                console.log('시도할 경로들:', pathsToTry);
+                
+                // 기본 배경색 설정
+                document.body.style.backgroundColor = '#2c3e50';
+                
+                // 첫 번째 경로로 시도
+                tryLoadImage(0, pathsToTry);
+                
+            } catch (error) {
+                console.log('배경 이미지 설정 로드 실패:', error);
+                document.body.style.backgroundImage = 'none';
+                document.body.style.backgroundColor = '#2c3e50';
+            }
+        }
+        
+        // 이미지 로드 시도 함수
+        function tryLoadImage(index, paths) {
+            if (index >= paths.length) {
+                console.log('모든 경로 시도 실패, 기본 배경색 사용');
+                document.body.style.backgroundImage = 'none';
+                return;
+            }
+            
+            const currentPath = paths[index];
+            console.log(`경로 ${index + 1} 시도:`, currentPath);
+            
+            const img = new Image();
+            img.onload = function() {
+                console.log('배경 이미지 로드 성공:', currentPath);
+                document.body.style.backgroundImage = `url('${currentPath}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+            };
+            img.onerror = function() {
+                console.log('배경 이미지 로드 실패:', currentPath);
+                // 다음 경로 시도
+                tryLoadImage(index + 1, paths);
+            };
+            img.src = currentPath;
+        }
+
         // 초기 로드
         window.onload = function() {
+            console.log('PPT 창 로드 시작');
             initializeState();
+            loadBackgroundImage();
             updateVerseDisplay();
+            console.log('PPT 창 로드 완료');
         };
         window.addEventListener('storage', function(e) {
             if (e.key === 'selectedVerse' || e.key === 'selectedBible' || e.key === 'selectedChapter' || e.key === 'verses') {
                 updateVerseDisplay();
             }
+            if (e.key === 'appSettings') {
+                loadBackgroundImage();
+            }
         });        // 말씀 업데이트 함수
         function updateVerseDisplay() {
+            console.log('updateVerseDisplay 시작');
             // 상태 업데이트
             initializeState();
+
+            console.log('현재 상태:', state);
 
             // 화면 업데이트
             titleElement.innerHTML = `${state.selectedBook} ${state.selectedChapter}장 ${state.selectedVerse}절`;
 
             const selectedVerseId = `verse-${state.selectedVerse}`;
             const selectedVerseContent = state.verses.find(v => v.includes(`id="${selectedVerseId}"`));
+
+            console.log('선택된 절 ID:', selectedVerseId);
+            console.log('찾은 절 내용:', selectedVerseContent);
 
             if (selectedVerseContent) {
                 let verseText = selectedVerseContent.replace(/<[^>]+>/g, '');
@@ -84,12 +170,14 @@
                     verseText = verseText.substring(colonIndex + 1).trim();
                 }
                 contentElement.innerHTML = verseText;
+                console.log('표시된 텍스트:', verseText);
             } else {
                 contentElement.innerHTML = "해당 절을 찾을 수 없습니다.";
+                console.log('절을 찾을 수 없음');
             }
 
             // localStorage에 업데이트
-            localStorage.setItem("selectedVerse", selectedVerse);
+            localStorage.setItem("selectedVerse", state.selectedVerse);
         }        // 다음 구절 표시 (구절 번호를 증가)
         function showNextVerse() {
             if (state.selectedVerse < state.verses.length) {

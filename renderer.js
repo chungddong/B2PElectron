@@ -453,12 +453,166 @@ function loadHistoryItem(item) {
 
 // 페이지 로드 시 히스토리 초기화 및 표시
 document.addEventListener('DOMContentLoaded', function() {
-    // 앱 시작 시 기존 히스토리 삭제
+    // 앱 시작 시 기존 히스토리 삭제 (설정은 유지)
     localStorage.removeItem('pptHistory');
     loadPPTHistory();
+    
+    // 설정이 존재하지 않으면 기본값 설정
+    if (!localStorage.getItem('appSettings')) {
+        const defaultSettings = {
+            backgroundPath: 'assets/bg01.jpg',
+            displayId: 'primary'
+        };
+        localStorage.setItem('appSettings', JSON.stringify(defaultSettings));
+    }
 });
 
-document.getElementById("slide-start-button").addEventListener("click", function () {
+// 페이지 전환 함수들
+function showMainPage() {
+    document.getElementById('main-page').style.display = 'block';
+    document.getElementById('settings-page').style.display = 'none';
+}
+
+function showSettingsPage() {
+    document.getElementById('main-page').style.display = 'none';
+    document.getElementById('settings-page').style.display = 'block';
+    loadSettings(); // 설정 페이지 열 때 설정 로드
+}
+
+// 설정 로드 함수
+function loadSettings() {
+    const settings = JSON.parse(localStorage.getItem('appSettings') || '{}');
+    
+    document.getElementById('background-path').value = settings.backgroundPath || 'assets/bg01.jpg';
+    document.getElementById('display-select').value = settings.displayId || 'primary';
+    
+    // 연결된 디스플레이 목록 로드
+    loadDisplayList();
+}
+
+// 연결된 디스플레이 목록 로드 함수
+async function loadDisplayList() {
+    try {
+        // Electron의 screen API를 사용하여 모든 디스플레이 정보 가져오기
+        const displays = await window.electronAPI?.getAllDisplays() || [];
+        const displaySelect = document.getElementById('display-select');
+        
+        // 기존 옵션들 제거 (기본 모니터 제외)
+        while (displaySelect.children.length > 1) {
+            displaySelect.removeChild(displaySelect.lastChild);
+        }
+        
+        // 각 디스플레이에 대해 옵션 추가
+        displays.forEach((display, index) => {
+            const option = document.createElement('option');
+            option.value = display.id;
+            option.textContent = `모니터 ${index + 1} (${display.bounds.width}x${display.bounds.height})`;
+            displaySelect.appendChild(option);
+        });
+    } catch (error) {
+        console.log('디스플레이 목록을 가져올 수 없습니다:', error);
+    }
+}
+
+// 파일 경로 유효성 검사 함수
+function validateBackgroundPath(path) {
+    try {
+        // 이미지 파일 확장자 검사
+        const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+        const extension = path.toLowerCase().substring(path.lastIndexOf('.'));
+        
+        if (!validExtensions.includes(extension)) {
+            return false;
+        }
+        
+        // 파일 존재 여부는 실제 사용 시 확인
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// 설정 저장 함수
+function saveSettings() {
+    let backgroundPath = document.getElementById('background-path').value.trim();
+    
+    // 배경 경로 유효성 검사 및 예외처리
+    if (!backgroundPath || !validateBackgroundPath(backgroundPath)) {
+        backgroundPath = 'assets/bg01.jpg';
+        document.getElementById('background-path').value = backgroundPath;
+        alert('잘못된 배경 이미지 경로입니다. 기본 배경으로 설정됩니다.');
+    }
+    
+    const settings = {
+        backgroundPath: backgroundPath,
+        displayId: document.getElementById('display-select').value
+    };
+    
+    try {
+        localStorage.setItem('appSettings', JSON.stringify(settings));
+        console.log('설정 저장됨:', settings);
+        
+        // 설정 저장 후 storage 이벤트를 수동으로 트리거하여 PPT 창 업데이트
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'appSettings',
+            newValue: JSON.stringify(settings),
+            storageArea: localStorage
+        }));
+        
+        alert('설정이 저장되었습니다.');
+        showMainPage();
+    } catch (error) {
+        console.error('설정 저장 실패:', error);
+        alert('설정 저장에 실패했습니다.');
+    }
+}
+
+// 설정 버튼 클릭 이벤트
+document.getElementById("setting-button").addEventListener("click", function() {
+    showSettingsPage();
+});
+
+// 뒤로가기 버튼 클릭 이벤트
+document.getElementById("back-button").addEventListener("click", function() {
+    showMainPage();
+});
+
+// 설정 페이지 버튼 이벤트들
+document.getElementById("save-btn").addEventListener("click", function() {
+    saveSettings();
+});
+
+document.getElementById("cancel-btn").addEventListener("click", function() {
+    showMainPage();
+});
+
+// 배경 이미지 변경 버튼 이벤트
+document.getElementById("browse-background").addEventListener("click", async function() {
+    try {
+        // Electron의 dialog API를 사용하여 파일 선택 다이얼로그 열기
+        const result = await window.electronAPI?.openFileDialog({
+            title: '배경 이미지 선택',
+            filters: [
+                { name: '이미지', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] },
+                { name: '모든 파일', extensions: ['*'] }
+            ]
+        });
+        
+        if (result && !result.canceled && result.filePaths.length > 0) {
+            const selectedPath = result.filePaths[0];
+            document.getElementById('background-path').value = selectedPath;
+        }
+    } catch (error) {
+        console.log('파일 선택 다이얼로그를 열 수 없습니다:', error);
+        // 폴백: 사용자가 직접 경로 입력할 수 있도록
+        const input = document.getElementById('background-path');
+        input.removeAttribute('readonly');
+        input.focus();
+        alert('파일 선택기를 사용할 수 없습니다. 직접 경로를 입력해주세요.');
+    }
+});
+
+document.getElementById("slide-start-button").addEventListener("click", async function () {
     console.log(verses);
 
     // 선택된 구절 정보 가져오기
@@ -482,13 +636,18 @@ document.getElementById("slide-start-button").addEventListener("click", function
     // PPT 히스토리에 저장
     savePPTHistory(bookName, selectedChapter, verseRange, new Date().toLocaleString('ko-KR'));
     
-    // PPT 창이 없거나 닫혀있으면 새로 생성
-    if (!pptWindow || pptWindow.closed) {
-        pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
-    } else {
-        // 기존 창이 있으면 해당 창의 updateVerseDisplay 함수를 호출
-        pptWindow.updateVerseDisplay();
-        pptWindow.focus(); // 기존 창을 포커스
+    // Electron API를 사용하여 PPT 창 열기
+    try {
+        await window.electronAPI.openPPTWindow();
+    } catch (error) {
+        console.error('PPT 창 열기 실패:', error);
+        // 폴백: 기존 방식으로 창 열기
+        if (!pptWindow || pptWindow.closed) {
+            pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
+        } else {
+            pptWindow.updateVerseDisplay();
+            pptWindow.focus();
+        }
     }
 });
 
