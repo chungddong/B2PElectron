@@ -89,20 +89,82 @@ body {
 
 /* -------------------------------------------------------------- */
 
-.Preview {
+.ContentArea {
     width: 100%;
     flex: 8;
     margin-bottom: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.Preview {
+    flex: 7;
     padding: 10px 10px;
     box-sizing: border-box;
     border-radius: 10px;
     background-color: #EDEDED;
     overflow-y: auto;
+    max-height: 320px;
+    height: 320px;
+}
+
+.HistoryPanel {
+    flex: 3;
+    background-color: #F8F8F8;
+    border-radius: 10px;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: 320px;
+    height: 320px;
+}
+
+.HistoryTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #E0E0E0;
+}
+
+.HistoryList {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.HistoryItem {
+    background-color: white;
+    border-radius: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+    border: 1px solid #E0E0E0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.HistoryItem:hover {
+    background-color: #F0F0F0;
+}
+
+.HistoryItem .BookTitle {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 3px;
+    font-size: 13px;
+}
+
+.HistoryItem .VerseRange {
+    font-size: 11px;
+    color: #666;
 }
 
 .ButtonBox {
     flex: 2;
     display: flex;
+    min-height: 60px;
 }
 
 .Button_ppt {
@@ -121,13 +183,14 @@ body {
 .Button_Slide {
     flex: 2;
     background-color: #414141;
-
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: bold;
     color: white;
+    min-height: 35px;
 }
 
 .Button_Slide:hover {

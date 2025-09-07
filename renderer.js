@@ -363,6 +363,101 @@ function hideError() {
 
 let pptWindow = null; // PPT 창을 추적하는 변수
 
+// PPT 히스토리 관련 함수들
+function loadPPTHistory() {
+    const history = JSON.parse(localStorage.getItem('pptHistory') || '[]');
+    displayPPTHistory(history);
+}
+
+function savePPTHistory(bookName, chapter, verseRange, timestamp) {
+    const history = JSON.parse(localStorage.getItem('pptHistory') || '[]');
+    const newEntry = {
+        id: Date.now(),
+        bookName: bookName,
+        chapter: chapter,
+        verseRange: verseRange,
+        timestamp: timestamp
+    };
+    
+    // 최신 항목이 위에 오도록 배열 앞에 추가
+    history.unshift(newEntry);
+    
+    // 최대 20개까지만 저장
+    if (history.length > 20) {
+        history.splice(20);
+    }
+    
+    localStorage.setItem('pptHistory', JSON.stringify(history));
+    displayPPTHistory(history);
+}
+
+function displayPPTHistory(history) {
+    const historyList = document.getElementById('ppt-history-list');
+    historyList.innerHTML = '';
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">생성된 PPT가 없습니다</div>';
+        return;
+    }
+    
+    history.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'HistoryItem';
+        historyItem.innerHTML = `
+            <div class="BookTitle">${item.bookName} ${item.chapter}장</div>
+            <div class="VerseRange">${item.verseRange}</div>
+        `;
+        
+        // 클릭 시 해당 성경구절로 이동
+        historyItem.addEventListener('click', function() {
+            loadHistoryItem(item);
+        });
+        
+        historyList.appendChild(historyItem);
+    });
+}
+
+function loadHistoryItem(item) {
+    // 성경 선택
+    const bookSelect = document.getElementById("bible-select");
+    for (let option of bookSelect.options) {
+        if (option.textContent.includes(item.bookName)) {
+            option.selected = true;
+            break;
+        }
+    }
+    
+    // 선택된 성경으로 장 목록 로드
+    loadBible(bookSelect.value).then(() => {
+        // 장 선택
+        const chapterSelect = document.getElementById("chapter-select");
+        chapterSelect.value = item.chapter;
+        chapterSelect.dispatchEvent(new Event("change"));
+        
+        // 약간의 지연 후 슬라이드 창 업데이트
+        setTimeout(() => {
+            // localStorage 업데이트
+            localStorage.setItem("selectedBible", bookSelect.value);
+            localStorage.setItem("selectedChapter", item.chapter);
+            localStorage.setItem("selectedVerse", "1");
+            localStorage.setItem('verses', JSON.stringify(verses));
+            
+            // 열려있는 PPT 창이 있으면 업데이트
+            if (pptWindow && !pptWindow.closed) {
+                pptWindow.updateVerseDisplay();
+                pptWindow.focus();
+            }
+        }, 600);
+    });
+}
+
+// 페이지 로드 시 히스토리 초기화 및 표시
+document.addEventListener('DOMContentLoaded', function() {
+    // 앱 시작 시 기존 히스토리 삭제
+    localStorage.removeItem('pptHistory');
+    loadPPTHistory();
+});
+
 document.getElementById("slide-start-button").addEventListener("click", function () {
     console.log(verses);
 
@@ -370,12 +465,24 @@ document.getElementById("slide-start-button").addEventListener("click", function
     const selectedBook = document.getElementById('bible-select').value;
     const selectedChapter = document.getElementById('chapter-select').value;
     const selectedVerse = document.getElementById('verse-select').value;
+    
+    // 선택된 성경 이름 가져오기
+    const bookName = document.getElementById('bible-select').selectedOptions[0].textContent;
+    
+    // 절 범위 계산 (현재 장의 모든 절)
+    const verseCount = verses.length;
+    const verseRange = `1-${verseCount}절`;
 
     // 구절 정보를 localStorage에 저장
     localStorage.setItem("selectedBible", selectedBook);
     localStorage.setItem("selectedChapter", selectedChapter);
     localStorage.setItem("selectedVerse", selectedVerse);
-    localStorage.setItem('verses', JSON.stringify(verses));    // PPT 창이 없거나 닫혀있으면 새로 생성
+    localStorage.setItem('verses', JSON.stringify(verses));
+    
+    // PPT 히스토리에 저장
+    savePPTHistory(bookName, selectedChapter, verseRange, new Date().toLocaleString('ko-KR'));
+    
+    // PPT 창이 없거나 닫혀있으면 새로 생성
     if (!pptWindow || pptWindow.closed) {
         pptWindow = window.open("ppt.html", "_blank", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,width=1200,height=800");
     } else {
