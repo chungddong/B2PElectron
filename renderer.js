@@ -371,6 +371,12 @@ function loadPPTHistory() {
 
 function savePPTHistory(bookName, chapter, verseRange, timestamp) {
     const history = JSON.parse(localStorage.getItem('pptHistory') || '[]');
+    
+    // 중복 확인: 같은 성경 책과 장이 이미 존재하는지 확인
+    const existingIndex = history.findIndex(item => 
+        item.bookName === bookName && item.chapter === chapter
+    );
+    
     const newEntry = {
         id: Date.now(),
         bookName: bookName,
@@ -379,8 +385,16 @@ function savePPTHistory(bookName, chapter, verseRange, timestamp) {
         timestamp: timestamp
     };
     
-    // 최신 항목이 위에 오도록 배열 앞에 추가
-    history.unshift(newEntry);
+    if (existingIndex !== -1) {
+        // 기존 항목이 있으면 제거하고 새 항목을 맨 앞에 추가 (최신으로 업데이트)
+        history.splice(existingIndex, 1);
+        history.unshift(newEntry);
+        console.log(`기존 ${bookName} ${chapter}장 기록을 업데이트했습니다.`);
+    } else {
+        // 새로운 항목이면 맨 앞에 추가
+        history.unshift(newEntry);
+        console.log(`새로운 ${bookName} ${chapter}장 기록을 추가했습니다.`);
+    }
     
     // 최대 20개까지만 저장
     if (history.length > 20) {
@@ -461,7 +475,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!localStorage.getItem('appSettings')) {
         const defaultSettings = {
             backgroundPath: 'assets/bg01.jpg',
-            displayId: 'primary'
+            displayId: 'primary',
+            titleFontSize: 64,
+            contentFontSize: 64,
+            titlePosition: 25,
+            contentPosition: 70,
+            textAlign: 'center'
         };
         localStorage.setItem('appSettings', JSON.stringify(defaultSettings));
     }
@@ -485,6 +504,16 @@ function loadSettings() {
     
     document.getElementById('background-path').value = settings.backgroundPath || 'assets/bg01.jpg';
     document.getElementById('display-select').value = settings.displayId || 'primary';
+    
+    // 텍스트 스타일링 설정 로드
+    document.getElementById('title-font-size').value = settings.titleFontSize || 64;
+    document.getElementById('content-font-size').value = settings.contentFontSize || 64;
+    document.getElementById('title-position').value = settings.titlePosition || 25;
+    document.getElementById('content-position').value = settings.contentPosition || 70;
+    document.getElementById('text-align').value = settings.textAlign || 'center';
+    
+    // 슬라이더 값 표시 업데이트
+    updateSliderDisplays();
     
     // 연결된 디스플레이 목록 로드
     loadDisplayList();
@@ -532,6 +561,14 @@ function validateBackgroundPath(path) {
     }
 }
 
+// 슬라이더 값 표시 업데이트 함수
+function updateSliderDisplays() {
+    document.getElementById('title-font-value').textContent = document.getElementById('title-font-size').value + 'px';
+    document.getElementById('content-font-value').textContent = document.getElementById('content-font-size').value + 'px';
+    document.getElementById('title-position-value').textContent = document.getElementById('title-position').value + '%';
+    document.getElementById('content-position-value').textContent = document.getElementById('content-position').value + '%';
+}
+
 // 설정 저장 함수
 function saveSettings() {
     let backgroundPath = document.getElementById('background-path').value.trim();
@@ -545,7 +582,12 @@ function saveSettings() {
     
     const settings = {
         backgroundPath: backgroundPath,
-        displayId: document.getElementById('display-select').value
+        displayId: document.getElementById('display-select').value,
+        titleFontSize: parseInt(document.getElementById('title-font-size').value),
+        contentFontSize: parseInt(document.getElementById('content-font-size').value),
+        titlePosition: parseInt(document.getElementById('title-position').value),
+        contentPosition: parseInt(document.getElementById('content-position').value),
+        textAlign: document.getElementById('text-align').value
     };
     
     try {
@@ -584,6 +626,23 @@ document.getElementById("save-btn").addEventListener("click", function() {
 
 document.getElementById("cancel-btn").addEventListener("click", function() {
     showMainPage();
+});
+
+// 슬라이더 실시간 업데이트 이벤트들
+document.getElementById("title-font-size").addEventListener("input", function() {
+    updateSliderDisplays();
+});
+
+document.getElementById("content-font-size").addEventListener("input", function() {
+    updateSliderDisplays();
+});
+
+document.getElementById("title-position").addEventListener("input", function() {
+    updateSliderDisplays();
+});
+
+document.getElementById("content-position").addEventListener("input", function() {
+    updateSliderDisplays();
 });
 
 // 배경 이미지 변경 버튼 이벤트

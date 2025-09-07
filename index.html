@@ -86,6 +86,52 @@
                         <!-- 연결된 모니터들이 여기에 추가됩니다 -->
                     </select>
                 </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">제목 글꼴 크기</div>
+                    <div class="setting-description">성경 구절 제목의 글꼴 크기를 조정합니다</div>
+                    <div class="range-container">
+                        <input type="range" id="title-font-size" min="20" max="80" value="64" class="setting-range">
+                        <span id="title-font-value">64px</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">내용 글꼴 크기</div>
+                    <div class="setting-description">성경 구절 내용의 글꼴 크기를 조정합니다</div>
+                    <div class="range-container">
+                        <input type="range" id="content-font-size" min="20" max="80" value="64" class="setting-range">
+                        <span id="content-font-value">64px</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">제목 위치</div>
+                    <div class="setting-description">제목의 상하 위치를 조정합니다</div>
+                    <div class="range-container">
+                        <input type="range" id="title-position" min="10" max="50" value="25" class="setting-range">
+                        <span id="title-position-value">25%</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">내용 위치</div>
+                    <div class="setting-description">내용의 상하 위치를 조정합니다</div>
+                    <div class="range-container">
+                        <input type="range" id="content-position" min="50" max="90" value="70" class="setting-range">
+                        <span id="content-position-value">70%</span>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <div class="setting-label">텍스트 정렬</div>
+                    <div class="setting-description">텍스트의 정렬 방식을 선택합니다</div>
+                    <select class="setting-select" id="text-align">
+                        <option value="center">가운데 정렬</option>
+                        <option value="left">왼쪽 정렬</option>
+                        <option value="right">오른쪽 정렬</option>
+                    </select>
+                </div>
             </div>
 
             <div class="buttons-container">

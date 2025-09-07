@@ -422,3 +422,44 @@ body {
     background-color: #555;
 }
 
+.range-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.setting-range {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.setting-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #414141;
+    cursor: pointer;
+}
+
+.setting-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #414141;
+    cursor: pointer;
+    border: none;
+}
+
+.range-container span {
+    min-width: 50px;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+}
+
